@@ -23,10 +23,75 @@ a:hover {
   color: #535bf2;
 }
 
+.flex {
+  display: flex;
+}
+.space-between {
+  justify-content: space-between;
+}
+.space-around {
+  justify-content: space-around;
+}
+.align-center {
+  align-items: center;
+}
+
+.w-100 {
+  width: 100%
+}
+
+.level-0-margin {
+  margin-left: 0px;
+}
+
+.level-1-margin {
+  margin-left: 15px;
+}
+
+.level-2-margin {
+  margin-left: 30px;
+}
+.w-60 {
+  width: 60%;
+}
+.m-auto {
+  margin: auto;
+}
+.mt-2 {
+  margin-top: 2rem;
+}
+.mb-2 {
+  margin-bottom: 2rem;
+}
+
+.blue-dot {
+  width: 18px;
+    height: 18px;
+    background: blue;
+    border-radius: 50%;
+    border: white 1px solid;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.white-dot {
+  width: 18px;
+  height: 18px;
+  background: gray;
+  border: white 1px solid;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.text-left {
+  text-align: left;
+}
+
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
+  /* display: flex; */
+  /* place-items: center; */
   min-width: 320px;
   min-height: 100vh;
 }
