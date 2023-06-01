@@ -1,8 +1,4 @@
-import './app.css'
-import App from './App.svelte'
-
-const app = new App({
-  target: document.getElementById('app'),
-})
-
-export default app
+export * from "./lib/InputForm.svelte";
+export * from "./lib/DirectoryTreeView.svelte";
+export * from "./lib/SelectDirectoryModal.svelte";
+export * from "./lib/SelectDirectoryTree.svelte";

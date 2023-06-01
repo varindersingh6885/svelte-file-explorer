@@ -1,3 +1,5 @@
+<svelte:options tag="directory-tree-view" />
+
 <script lang="ts">
   import { children } from "svelte/internal";
   import { createEventDispatcher } from "svelte";
@@ -9,18 +11,24 @@
     children: FileFolderCollection[];
   }
   export let fileFolderData: FileFolderCollection[] = [];
-  export let level;
+  export let level: number = 0;
 
-  const folders = fileFolderData;
+  // const folders = fileFolderData;
 </script>
 
 <div class="text-left">
   <!-- {#if level < 2} -->
-  {#each folders as data, index}
+  {#each fileFolderData as data, index}
     <div>
-      <div class={`level-${level}-margin flex align-center`}>
+      <div
+        class={`level-${level}-margin flex align-center`}
+        style="margin-bottom: 0.5rem"
+      >
         <!-- <div> -->
-        <span class="mr-1">|-- </span>
+        {#each data.path as path}
+          <span class="mr-1">&nbsp; &nbsp; &nbsp;</span>
+        {/each}
+        <span class="mr-1">|--</span>
         {#if data.type === "folder"}
           <!-- <div class="inline-block w-18 mr-1"> -->
           <div class="h-18 mr-1">
