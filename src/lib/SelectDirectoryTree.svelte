@@ -1,3 +1,5 @@
+<svelte:options tag="select-directory" />
+
 <script lang="ts">
   import { children } from "svelte/internal";
   import { createEventDispatcher } from "svelte";
@@ -13,8 +15,32 @@
   export let path: number[] = [];
   export let selectedPath: number[] = [];
 
-  // console.log(path);
-  // console.log(selectedPath);
+  let getAllDirectoriesTillLevel2 = (fileFolderData, lvl) => {
+    let arr = [];
+    if (lvl >= 2) return arr;
+    fileFolderData.forEach((item) => {
+      if (item.type === "folder") {
+        arr.push(item);
+        if (item.children.length) {
+          arr = [
+            ...arr,
+            ...getAllDirectoriesTillLevel2(item.children, lvl + 1),
+          ];
+        }
+      }
+    });
+    return arr;
+  };
+
+  const getAllDirectories = () => {
+    let dataStorage = localStorage.getItem("file-folder-collection");
+    if (dataStorage) {
+      return JSON.parse(dataStorage);
+    }
+  };
+
+  const directories = getAllDirectoriesTillLevel2(getAllDirectories(), 0);
+
   const dispatch = createEventDispatcher();
 
   // filter only folders
@@ -22,37 +48,34 @@
   // .filter((item) => {
   //   return item.type === "folder";
   // });
-  // console.log(folders);
   const selectFolder = (path) => {
-    // console.log([...path, index]);
     dispatch("folder-select", { path });
-    // console.log(selectedPath)
   };
 
   const isSelected = (path1, path2): boolean => {
-    // console.log(folder);
-    // console.log(path1, path2);
     if (path1.length !== path2.length) return false;
     for (let i = 0; i < path1.length; i++) {
       if (path1[i] !== path2[i]) return false;
     }
-    // console.log(true, selectedPath);
     return true;
   };
 </script>
 
 <!-- <div> -->
 {#if level < 2}
-  {#each folders as folder, index}
+  {#each directories as folder, index}
     <!-- <div> -->
     <!-- <div class={`level-${folder.path.length - 1}-margin`}> -->
     <div class="m-auto w-60">
-      <div class="flex space-between">
+      <div class="flex space-between" style="margin-bottom: 0.5rem;">
         <div>
           <div
             class={`level-${folder.path.length - 1}-margin flex align-center`}
           >
             <!-- <div> -->
+            {#each folder.path as path}
+              <span class="mr-1">&nbsp; &nbsp; &nbsp;</span>
+            {/each}
             <span class="mr-1">|-- </span>
             <!-- <div class="inline-block w-18 mr-1"> -->
             <div class="h-18 mr-1">
@@ -92,7 +115,18 @@
           </div>
         </div>
         {#if isSelected(selectedPath, folder.path)}
-          <div class="blue-dot" on:click={() => selectFolder(folder.path)} />
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div
+            on:click={() => selectFolder(folder.path)}
+            class="blue-dot"
+            style="width: 18px;
+            height: 18px;
+            background: blue;
+            border-radius: 50%;
+            border: white 1px solid;
+            cursor: pointer;
+            display: inline-block;"
+          />
           <!-- <button on:click={() => selectFolder(folder.path)}>
             <div>
               O
@@ -100,7 +134,18 @@
             </div></button
           > -->
         {:else}
-          <div class="white-dot" on:click={() => selectFolder(folder.path)} />
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div
+            on:click={() => selectFolder(folder.path)}
+            class="white-dot"
+            style="width: 18px;
+              height: 18px;
+              background: gray;
+              border: white 1px solid;
+              border-radius: 50%;
+              cursor: pointer;
+              display: inline-block;"
+          />
           <!-- <button on:click={() => selectFolder(folder.path)}> select </button> -->
         {/if}
       </div>

@@ -136,6 +136,24 @@ h1 {
   text-align: center;
 }
 
+
+.input {
+  padding: 0.7rem;
+  width: 80%;
+  margin: 10px;
+}
+.input-dropdown {
+  width: 20%;
+  margin: 10px;
+  text-align: center;
+}
+
+.input-dropdown option {
+  width: 20%;
+  margin: 10px;
+  text-align: center;
+}
+
 /* button {
   border-radius: 8px;
   border: 1px solid transparent;
