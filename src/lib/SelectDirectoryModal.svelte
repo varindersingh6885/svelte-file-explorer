@@ -11,7 +11,7 @@
   export let fileFolderData: FileFolderCollection[] = [];
   export let selectedPath: number[] = [];
 
-  console.log(fileFolderData);
+  // console.log(fileFolderData);
   // const getDirectories = () => {
   //   const data = localStorage.getItem("file-folder-collection");
   //   if (data) {
@@ -27,7 +27,6 @@
   <div id="modal" class="modal text-left">
     <div class="flex space-between align-center">
       <h2>Select Directory</h2>
-      <button on:click={() => dispatch("modalClose")}>X</button>
     </div>
 
     <!-- {#each fileFolderData as fileFolder, index}
@@ -41,8 +40,17 @@
       on:folder-select
     />
     <div class="mt-2 mb-2 m-auto w-60 flex space-between">
-      <button>Save</button>
-      <button on:click={() => dispatch("modalClose")}>Cancel</button>
+      <button
+        disabled={!selectedPath.length}
+        on:click={() => dispatch("modalClose")}>Select</button
+      >
+      <button
+        on:click={() => {
+          dispatch("resetDropdown");
+          dispatch("modalClose");
+          dispatch("resetSelectedPath");
+        }}>Cancel</button
+      >
     </div>
   </div>
 </div>
@@ -62,13 +70,18 @@
     left: 0;
     z-index: 10;
     box-sizing: border-box;
-    background: rgb(0, 0, 0, 0.75);
+    background: rgb(0, 0, 0, 0.55);
   }
   .modal {
     width: 60%;
+    height: 50%;
     padding: 1rem 2rem;
     border-radius: 15px;
-    border: 1px solid white;
-    background-color: black;
+    /* border: 1px solid white;
+    background-color: black; */
+    background-color: white;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 2px 2px rgba(0, 0, 0, 0.12),
+      0 4px 4px rgba(0, 0, 0, 0.12), 0 8px 8px rgba(0, 0, 0, 0.12),
+      0 16px 16px rgba(0, 0, 0, 0.12);
   }
 </style>
