@@ -1,45 +1,51 @@
-<svelte:options tag="directory-tree-view" />
+<svelte:options tag="select-directory" />
 
 <script lang="ts">
-  import { children } from "svelte/internal";
-  import { createEventDispatcher } from "svelte";
+  import { directoryStore, selectedPathStore } from "./stores";
+  import { getAllDirectoriesTillLevel2 } from "./utils";
 
-  interface FileFolderCollection {
-    type: string;
-    name: string;
-    path: number[];
-    children: FileFolderCollection[];
-  }
-  export let fileFolderData: FileFolderCollection[] = [];
-  export let level: number = 0;
+  let selectedPath: number[] = [];
 
-  // const folders = fileFolderData;
+  let directoriesTillLevel2 = [];
+
+  directoryStore.subscribe((value) => {
+    directoriesTillLevel2 = getAllDirectoriesTillLevel2(value, 0);
+  });
+
+  selectedPathStore.subscribe((value) => {
+    selectedPath = value;
+  });
+  const selectFolder = (path) => {
+    selectedPathStore.set(path);
+  };
+
+  const isSelected = (path1, path2): boolean => {
+    if (path1.length !== path2.length) return false;
+    for (let i = 0; i < path1.length; i++) {
+      if (path1[i] !== path2[i]) return false;
+    }
+    return true;
+  };
 </script>
 
-<div class="text-left">
-  <!-- {#if level < 2} -->
-  {#each fileFolderData as data, index}
-    <div>
-      <div
-        class={`level-${level}-margin flex align-center`}
-        style="margin-bottom: 0.5rem"
-      >
-        <!-- <div> -->
-        {#each data.path as path}
-          <span class="mr-1">&nbsp; &nbsp; &nbsp;</span>
-        {/each}
-        <span class="mr-1">|--</span>
-        {#if data.type === "folder"}
-          <!-- <div class="inline-block w-18 mr-1"> -->
+{#each directoriesTillLevel2 as folder, index}
+  <div class="m-auto w-60">
+    <div class="flex space-between" style="margin-bottom: 0.5rem;">
+      <div>
+        <div class={`level-${folder.path.length - 1}-margin flex align-center`}>
+          {#each folder.path as path}
+            <span class="mr-1">&nbsp; &nbsp; &nbsp;</span>
+          {/each}
+          <span class="mr-1">|-- </span>
           <div class="h-18 mr-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               xmlns:xlink="http://www.w3.org/1999/xlink"
               version="1.1"
               width="18"
+              height="18"
               viewBox="0 0 256 256"
               xml:space="preserve"
-              style="height: 100%"
             >
               <defs />
               <g
@@ -61,29 +67,36 @@
               </g>
             </svg>
           </div>
-          <!-- </div> -->
           <span>
-            {`  ${data.name}`}
+            {`  ${folder.name}`}
           </span>
-        {:else}
-          <div class="inline-block w-18 h-18">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 50 50"
-              width="18px"
-              height="18px"
-              ><path
-                d="M 7 2 L 7 48 L 43 48 L 43 14.59375 L 42.71875 14.28125 L 30.71875 2.28125 L 30.40625 2 Z M 9 4 L 29 4 L 29 16 L 41 16 L 41 46 L 9 46 Z M 31 5.4375 L 39.5625 14 L 31 14 Z"
-              /></svg
-            >
-          </div>
-          {`  ${data.name}`}
-        {/if}
+        </div>
       </div>
-      {#if data.type === "folder" && data.children.length}
-        <svelte:self fileFolderData={[...data.children]} level={level + 1} />
+      {#if isSelected(selectedPath, folder.path)}
+        <button
+          on:click={() => selectFolder(folder.path)}
+          class="blue-dot"
+          style="width: 18px;
+            height: 18px;
+            background: blue;
+            border-radius: 50%;
+            border: white 1px solid;
+            cursor: pointer;
+            display: inline-block;"
+        />
+      {:else}
+        <button
+          on:click={() => selectFolder(folder.path)}
+          class="white-dot"
+          style="width: 18px;
+              height: 18px;
+              background: gray;
+              border: white 1px solid;
+              border-radius: 50%;
+              cursor: pointer;
+              display: inline-block;"
+        />
       {/if}
     </div>
-  {/each}
-  <!-- {/if} -->
-</div>
+  </div>
+{/each}
