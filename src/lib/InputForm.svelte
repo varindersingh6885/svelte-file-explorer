@@ -5,40 +5,11 @@
   import SelectDirectoryModal from "./SelectDirectoryModal.svelte";
   import { directoryStore, selectedPathStore } from "./stores";
   import { getAllDirectories, updateLocalStorage } from "./utils";
-  // interface FileFolderCollection {
-  //   type: string;
-  //   name: string;
-  //   path: number[];
-  //   children: FileFolderCollection[];
-  // }
 
   let input: string = "";
   let inputType: string = "";
   let isSelectDirectoryModalOpen = false;
   const baseLevel = 0;
-
-  // const createRootDirectory = () => {
-  //   const directory = {
-  //     type: "folder",
-  //     name: "Root",
-  //     path: [0],
-  //     children: [],
-  //   };
-
-  //   localStorage.setItem("file-folder-collection", JSON.stringify([directory]));
-  //   return [directory];
-  // };
-
-  // const getAllDirectories = () => {
-  //   let dataStorage = localStorage.getItem("file-folder-collection");
-  //   if (dataStorage) {
-  //     return JSON.parse(dataStorage);
-  //   } else {
-  //     return createRootDirectory();
-  //   }
-  // };
-
-  // let allDirectoryData: FileFolderCollection[] = null;
 
   let allDirectoryData: DirectoryData[] = [];
 
@@ -48,19 +19,11 @@
 
   let selectedPath: number[] = [];
 
-  // let directories = [];
-
-  // if (!allDirectoryData) {
-  //   directoryStore.set(createRootDirectory());
-  // }
-
   selectedPathStore.subscribe((value) => {
     selectedPath = value;
   });
 
   const toggleSelectDirectoryModalOpen = () => {
-    // directoryStore.set(getAllDirectories());
-    // directories = getAllDirectoriesTillLevel2(allDirectoryData, 0);
     isSelectDirectoryModalOpen = !isSelectDirectoryModalOpen;
   };
 
@@ -74,10 +37,6 @@
     inputType = "";
   };
 
-  // const resetSelectedPath = () => {
-  //   selectedPathStore.set([]);
-  // };
-
   const handleInputChange = (e) => {
     input = e.target.value.trim();
   };
@@ -90,27 +49,6 @@
     }
   };
 
-  // const setSelectedPath = (event) => {
-  //   selectedPathStore.set(event?.detail?.path);
-  // };
-
-  // let getAllDirectoriesTillLevel2 = (allDirectoryData, lvl) => {
-  //   let arr = [];
-  //   if (lvl >= 2) return arr;
-  //   allDirectoryData.forEach((item) => {
-  //     if (item.type === "folder") {
-  //       arr.push(item);
-  //       if (item.children.length) {
-  //         arr = [
-  //           ...arr,
-  //           ...getAllDirectoriesTillLevel2(item.children, lvl + 1),
-  //         ];
-  //       }
-  //     }
-  //   });
-  //   return arr;
-  // };
-
   const handleSubmit = () => {
     let folderToSave = allDirectoryData[0];
     if (selectedPath.length > 1) {
@@ -121,16 +59,9 @@
 
     updateLocalStorage(allDirectoryData);
 
-    allDirectoryData = getAllDirectories();
+    directoryStore.set(getAllDirectories());
     resetForm();
   };
-
-  // const updateLocalStorage = (allDirectoryData) => {
-  //   localStorage.setItem(
-  //     "file-folder-collection",
-  //     JSON.stringify(allDirectoryData)
-  //   );
-  // };
 
   const saveData = (folderToSave, name, inputType) => {
     for (let child of folderToSave.children) {
@@ -196,18 +127,12 @@
       on:resetDropdown={resetDropdown}
     />
   {/if}
-  <!-- on:resetSelectedPath={resetSelectedPath} -->
-  <!-- on:folder-select={setSelectedPath} -->
-  <!-- fileFolderData={directories} -->
-  <!-- {selectedPath} -->
 
   <div class="w-60 m-auto p-30">
     <h3 style="text-align: center;">Data Heirarchy</h3>
-    <!-- {#key allDirectoryData} -->
     {#if allDirectoryData?.length}
       <DirectoryTreeView level={baseLevel} {allDirectoryData} />
     {/if}
-    <!-- {/key} -->
   </div>
 </div>
 

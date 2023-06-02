@@ -4,5 +4,3 @@ import { getAllDirectories } from "./utils";
 export const selectedPathStore = writable<number[]>([]);
 
 export const directoryStore = writable<DirectoryData[]>(getAllDirectories());
-
-const directoryData = getAllDirectories();
