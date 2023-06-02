@@ -3,66 +3,80 @@
 <script lang="ts">
   import DirectoryTreeView from "./DirectoryTreeView.svelte";
   import SelectDirectoryModal from "./SelectDirectoryModal.svelte";
-  interface FileFolderCollection {
-    type: string;
-    name: string;
-    path: number[];
-    children: FileFolderCollection[];
-  }
+  import { directoryStore, selectedPathStore } from "./stores";
+  import { getAllDirectories, updateLocalStorage } from "./utils";
+  // interface FileFolderCollection {
+  //   type: string;
+  //   name: string;
+  //   path: number[];
+  //   children: FileFolderCollection[];
+  // }
 
-  let input = "";
-  let inputType = "";
+  let input: string = "";
+  let inputType: string = "";
   let isSelectDirectoryModalOpen = false;
   const baseLevel = 0;
 
-  const createRootDirectory = () => {
-    const directory = {
-      type: "folder",
-      name: "Root",
-      path: [0],
-      children: [],
-    };
+  // const createRootDirectory = () => {
+  //   const directory = {
+  //     type: "folder",
+  //     name: "Root",
+  //     path: [0],
+  //     children: [],
+  //   };
 
-    localStorage.setItem("file-folder-collection", JSON.stringify([directory]));
-    return [directory];
-  };
+  //   localStorage.setItem("file-folder-collection", JSON.stringify([directory]));
+  //   return [directory];
+  // };
 
-  const getAllDirectories = () => {
-    let dataStorage = localStorage.getItem("file-folder-collection");
-    if (dataStorage) {
-      return JSON.parse(dataStorage);
-    } else {
-      return createRootDirectory();
-    }
-  };
+  // const getAllDirectories = () => {
+  //   let dataStorage = localStorage.getItem("file-folder-collection");
+  //   if (dataStorage) {
+  //     return JSON.parse(dataStorage);
+  //   } else {
+  //     return createRootDirectory();
+  //   }
+  // };
 
-  let fileFolderData: FileFolderCollection[] = null;
+  // let allDirectoryData: FileFolderCollection[] = null;
+
+  let allDirectoryData: DirectoryData[] = [];
+
+  directoryStore.subscribe((value) => {
+    allDirectoryData = value;
+  });
+
   let selectedPath: number[] = [];
-  let directories = [];
 
-  if (!fileFolderData) {
-    fileFolderData = getAllDirectories();
-  }
+  // let directories = [];
+
+  // if (!allDirectoryData) {
+  //   directoryStore.set(createRootDirectory());
+  // }
+
+  selectedPathStore.subscribe((value) => {
+    selectedPath = value;
+  });
 
   const toggleSelectDirectoryModalOpen = () => {
-    fileFolderData = getAllDirectories();
-    directories = getAllDirectoriesTillLevel2(fileFolderData, 0);
+    // directoryStore.set(getAllDirectories());
+    // directories = getAllDirectoriesTillLevel2(allDirectoryData, 0);
     isSelectDirectoryModalOpen = !isSelectDirectoryModalOpen;
   };
 
   const resetForm = () => {
     input = "";
     inputType = "";
-    selectedPath = [];
+    selectedPathStore.set([]);
   };
 
   const resetDropdown = () => {
     inputType = "";
   };
 
-  const resetSelectedPath = () => {
-    selectedPath = [];
-  };
+  // const resetSelectedPath = () => {
+  //   selectedPathStore.set([]);
+  // };
 
   const handleInputChange = (e) => {
     input = e.target.value.trim();
@@ -71,56 +85,59 @@
   const handleDropdownValueChange = (e) => {
     if (e.target.value !== "") {
       inputType = e.target.value;
-      selectedPath = [];
+      selectedPathStore.set([]);
       toggleSelectDirectoryModalOpen();
     }
   };
 
-  const setSelectedPath = (event) => {
-    selectedPath = event?.detail?.path;
-  };
+  // const setSelectedPath = (event) => {
+  //   selectedPathStore.set(event?.detail?.path);
+  // };
 
-  let getAllDirectoriesTillLevel2 = (fileFolderData, lvl) => {
-    let arr = [];
-    if (lvl >= 2) return arr;
-    fileFolderData.forEach((item) => {
-      if (item.type === "folder") {
-        arr.push(item);
-        if (item.children.length) {
-          arr = [
-            ...arr,
-            ...getAllDirectoriesTillLevel2(item.children, lvl + 1),
-          ];
-        }
-      }
-    });
-    return arr;
-  };
+  // let getAllDirectoriesTillLevel2 = (allDirectoryData, lvl) => {
+  //   let arr = [];
+  //   if (lvl >= 2) return arr;
+  //   allDirectoryData.forEach((item) => {
+  //     if (item.type === "folder") {
+  //       arr.push(item);
+  //       if (item.children.length) {
+  //         arr = [
+  //           ...arr,
+  //           ...getAllDirectoriesTillLevel2(item.children, lvl + 1),
+  //         ];
+  //       }
+  //     }
+  //   });
+  //   return arr;
+  // };
 
   const handleSubmit = () => {
-    let folderToSave = fileFolderData[0];
+    let folderToSave = allDirectoryData[0];
     if (selectedPath.length > 1) {
       folderToSave = folderToSave.children[selectedPath[1]];
     }
 
     saveData(folderToSave, input, inputType);
 
-    updateLocalStorage(fileFolderData);
-    fileFolderData = getAllDirectories();
+    updateLocalStorage(allDirectoryData);
+
+    allDirectoryData = getAllDirectories();
     resetForm();
   };
 
-  const updateLocalStorage = (fileFolderData) => {
-    localStorage.setItem(
-      "file-folder-collection",
-      JSON.stringify(fileFolderData)
-    );
-  };
+  // const updateLocalStorage = (allDirectoryData) => {
+  //   localStorage.setItem(
+  //     "file-folder-collection",
+  //     JSON.stringify(allDirectoryData)
+  //   );
+  // };
 
   const saveData = (folderToSave, name, inputType) => {
     for (let child of folderToSave.children) {
       if (child.type === inputType && child.name === name) {
-        alert("duplicate" + inputType);
+        alert(
+          `${inputType.toUpperCase()} named "${name}" already exists \n In the selected directory!`
+        );
         console.warn("duplicate " + inputType);
         return;
       }
@@ -162,12 +179,12 @@
   </div>
   <div style="display: flex; width: 100%; justify-content: center;">
     <button
-      style="padding: 10px; margin: 0.5rem"
+      style="padding: 10px 20px; margin: 0.5rem;"
       disabled={!input || !selectedPath.length}
       on:click={handleSubmit}>Save</button
     >
     <button
-      style="padding: 10px; margin: 0.5rem"
+      style="padding: 10px 20px; margin: 0.5rem;"
       disabled={!input}
       on:click={resetForm}>Cancel</button
     >
@@ -176,19 +193,19 @@
   {#if isSelectDirectoryModalOpen && input}
     <SelectDirectoryModal
       on:modalClose={toggleSelectDirectoryModalOpen}
-      fileFolderData={directories}
-      {selectedPath}
-      on:folder-select={setSelectedPath}
       on:resetDropdown={resetDropdown}
-      on:resetSelectedPath={resetSelectedPath}
     />
   {/if}
+  <!-- on:resetSelectedPath={resetSelectedPath} -->
+  <!-- on:folder-select={setSelectedPath} -->
+  <!-- fileFolderData={directories} -->
+  <!-- {selectedPath} -->
 
   <div class="w-60 m-auto p-30">
     <h3 style="text-align: center;">Data Heirarchy</h3>
-    <!-- {#key fileFolderData} -->
-    {#if fileFolderData?.length}
-      <DirectoryTreeView level={baseLevel} {fileFolderData} />
+    <!-- {#key allDirectoryData} -->
+    {#if allDirectoryData?.length}
+      <DirectoryTreeView level={baseLevel} {allDirectoryData} />
     {/if}
     <!-- {/key} -->
   </div>

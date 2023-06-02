@@ -4,22 +4,19 @@
   import { createEventDispatcher } from "svelte";
   import { each } from "svelte/internal";
   import SelectDirectoryTree from "./SelectDirectoryTree.svelte";
+  import { selectedPathStore } from "./stores";
   interface FileFolderCollection {
     type: string;
     name: string;
     path: number[];
     children: FileFolderCollection[];
   }
-  export let fileFolderData: FileFolderCollection[] = [];
-  export let selectedPath: number[] = [];
+  // export let fileFolderData: FileFolderCollection[] = [];
+  let selectedPath: number[] = [];
 
-  // const getDirectories = () => {
-  //   const data = localStorage.getItem("file-folder-collection");
-  //   if (data) {
-  //     fileFolderData = JSON.parse(data);
-  //     console.log(fileFolderData);
-  //   }
-  // };
+  selectedPathStore.subscribe((value) => {
+    selectedPath = value;
+  });
 
   const dispatch = createEventDispatcher();
 </script>
@@ -56,31 +53,28 @@ background: rgb(0, 0, 0, 0.55);"
     0 16px 16px rgba(0, 0, 0, 0.12);"
   >
     <div class="flex space-between align-center">
-      <h2>Select Directory</h2>
+      <h2 style="text-align: center; width: 100%">Select Directory</h2>
     </div>
 
-    <!-- {#each fileFolderData as fileFolder, index}
-      <div>{fileFolder.name}</div>
-    {/each} -->
-    <SelectDirectoryTree
-      {fileFolderData}
-      level={0}
-      path={[]}
-      {selectedPath}
-      on:folder-select
-    />
+    <div style="padding: 1rem;">
+      <SelectDirectoryTree />
+    </div>
+    <!-- {fileFolderData}
+    level={0}
+    path={[]} -->
     <div class="mt-2 mb-2 m-auto w-60 flex space-between">
       <button
-        style="padding: 10px; margin: 0.5rem"
+        style="padding: 10px 20px; margin: 0.5rem;"
         disabled={!selectedPath.length}
         on:click={() => dispatch("modalClose")}>Select</button
       >
       <button
-        style="padding: 10px; margin: 0.5rem"
+        style="padding: 10px 20px; margin: 0.5rem;"
         on:click={() => {
           dispatch("resetDropdown");
           dispatch("modalClose");
-          dispatch("resetSelectedPath");
+          // dispatch("resetSelectedPath");
+          selectedPathStore.set([]);
         }}>Cancel</button
       >
     </div>
